@@ -10,7 +10,9 @@ const browser = await chromium.launch({
 });
 
 // Open a new page / tab in the browser.
-const page = await browser.newPage();
+const page = await browser.newPage({
+    bypassCSP: true,
+});
 
 // Tell the tab to navigate to the JavaScript topic page.
 await page.goto(url);
@@ -19,12 +21,13 @@ await page.goto(url);
 await page.click('text=Load more');
 
 //Content Security Policy not allowed this function
-/*await page.waitForFunction(() => {
+await page.waitForFunction(() => {
     const repoCards = document.querySelectorAll('article.border');
     // GitHub displays 20 repositories per page.
     // We wait until there's more than 20.
     return repoCards.length > 20;
-});*/
+});
+
 
 // Pause for 10 seconds, to see what's going on.
 await page.waitForTimeout(15000);
