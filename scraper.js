@@ -28,6 +28,39 @@ await page.waitForFunction(() => {
     return repoCards.length > 20;
 });
 
+// Extract data from the page. Selecting all 'article' elements
+// will return all the repository cards we're looking for.
+const repos = await page.$$eval('article.border', (repoCards) => {
+    return repoCards.map(card => {
+        const [user, repo] = card.querySelectorAll('h3 a');
+        const stars = card.querySelector('#repo-stars-counter-star')
+            .getAttribute('title');
+        const description = card.querySelector('div.px-3 > p');
+        const topics = card.querySelectorAll('a.topic-tag');
+
+        const toText = (element) => element && element.innerText.trim();
+        const parseNumber = (text) => Number(text.replace(/,/g, ''));
+
+        return {
+            user: toText(user),
+            repo: toText(repo),
+            url: repo.href,
+            stars: parseNumber(stars),
+            description: toText(description),
+            topics: Array.from(topics).map((t) => toText(t)),
+        };
+    });
+});
+
+
+// Print the results 🚀
+console.log(`We extracted ${repos.length} repositories.`);
+console.dir(repos);
+
+
+
+
+
 
 // Pause for 10 seconds, to see what's going on.
 await page.waitForTimeout(15000);
